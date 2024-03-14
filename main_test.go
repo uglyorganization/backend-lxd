@@ -25,7 +25,7 @@ func TestMain(t *testing.T) {
 	t.Run("it should return error on GET", func(t *testing.T) {
 		_, err := http.Get("http://localhost:8081")
 		assert.NoError(t, err)
-		assert.ErrorContains(t, assert.AnError, "connection refused")
+		assert.ErrorContains(t, err, "connection refused")
 	})
 
 	t.Run("it should return unauthorized when API-key not presentGET", func(t *testing.T) {
