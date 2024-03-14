@@ -1,7 +1,7 @@
 package main
 
 import (
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -10,6 +10,10 @@ func main() {
 
 // Start with a /health
 func Start() {
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {})
-	http.ListenAndServe(":8080", nil)
+	r := gin.Default()
+	r.GET("/health", func(c *gin.Context) {})
+	err := r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	if err != nil {
+		panic("Error occurred while running the server: " + err.Error())
+	}
 }
