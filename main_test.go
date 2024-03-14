@@ -11,7 +11,7 @@ func TestMain(t *testing.T) {
 	go Start()
 
 	t.Run("it should return 200 when health is ok", func(t *testing.T) {
-		resp, err := http.Get("http://localhost:8080/v1/health")
+		resp, err := http.Get("http://localhost:8080/health")
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 	})
