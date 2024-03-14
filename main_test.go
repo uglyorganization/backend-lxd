@@ -39,8 +39,7 @@ func TestMain(t *testing.T) {
 		req.Header.Set("API-Key", "your-api-key")
 
 		resp, err := client.Do(req)
-		defer resp.Body.Close()
-
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 	})
 }
