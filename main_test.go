@@ -2,43 +2,33 @@ package main
 
 import (
 	"net/http"
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(t *testing.T) {
 	go Start()
 
 	t.Run("it should return 200 when health is ok", func(t *testing.T) {
-		resp, err := http.Get("http://localhost:8080/health")
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			t.Errorf("Equal(%d, %d) = false", resp.StatusCode, http.StatusOK)
-		}
+		resp, err := http.Get("http://localhost:8080/v1/health")
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
 	})
 
 	t.Run("it should return 404 for any other endpoint", func(t *testing.T) {
-		resp, err := http.Get("http://localhost:8080/nonexistent")
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if resp.StatusCode != http.StatusNotFound {
-			t.Errorf("Equal(%d, %d) = false", resp.StatusCode, http.StatusNotFound)
-		}
+		resp, err := http.Get("http://localhost:8080/v1/nonexistent")
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 	})
 
 	t.Run("it should return error on GET", func(t *testing.T) {
 		_, err := http.Get("http://localhost:8081")
-		if err == nil {
-			t.Fatal("Expected error, connect: connection refused")
-		}
+		assert.NoError(t, err)
+		assert.ErrorContains(t, assert.AnError, "connection refused")
+	})
 
-		if !strings.Contains(err.Error(), "connection refused") {
-			t.Fatalf("Expected error, connect: connection refused, got: %s", err.Error())
-		}
+	t.Run("it should return unauthorized when API-key not presentGET", func(t *testing.T) {
+		t.Fatal("todo")
 	})
 }
