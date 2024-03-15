@@ -35,7 +35,6 @@ func main() {
 // Start with a /health
 func Start() {
 	r := gin.Default()
-	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
 	r.GET("/health", func(c *gin.Context) {})
