@@ -19,7 +19,9 @@ jobs:
     - name: Cache Go modules
       uses: actions/cache@v3
       with:
-        path: ~/go/pkg/mod
+        path: |
+          ${{ github.workspace }}/go/pkg/mod
+          ${{ env.GOPATH }}/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
