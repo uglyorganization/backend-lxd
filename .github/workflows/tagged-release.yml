@@ -45,5 +45,5 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Name,Values=BackendLXD" \
-            --parameters commands=["echo 'Hello World'"] \
+            --parameters commands=["echo Hello World"] \
             --comment "Deploying tagged release ${GITHUB_REF_NAME} to BackendLXD"
