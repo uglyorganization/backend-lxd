@@ -36,10 +36,10 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-backend-lxd
           aws-region: eu-west-1
 
-  - name: Deploy to EC2 using SSM
-        run: |
-          aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --targets "Key=tag:Application,Values=BackendLXD" \
-            --parameters commands=["docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}","docker stop backend-lxd","docker run -d --name backend-lxd --restart=always -p 80:80 ghcr.io/${{ github.repository }}:${{ github.ref_name }}"] \
-            --comment "Deploying tagged release ${GITHUB_REF_NAME} to BackendLXD"
+      - name: Deploy to EC2 using SSM
+            run: |
+              aws ssm send-command \
+                --document-name "AWS-RunShellScript" \
+                --targets "Key=tag:Application,Values=BackendLXD" \
+                --parameters commands=["docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}","docker stop backend-lxd","docker run -d --name backend-lxd --restart=always -p 80:80 ghcr.io/${{ github.repository }}:${{ github.ref_name }}"] \
+                --comment "Deploying tagged release ${GITHUB_REF_NAME} to BackendLXD"
