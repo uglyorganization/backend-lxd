@@ -30,7 +30,7 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.ref_name }}
 
-      - name: Configure AWS Credentials for frontend
+      - name: Configure AWS Credentials for backend-lxd
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-backend-lxd
