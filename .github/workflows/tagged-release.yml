@@ -45,5 +45,7 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Name,Values=BackendLXD" \
-            --parameters commands=["docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}","docker stop backend-lxd","docker run -d --name backend-lxd --restart=always -p 8080:8080 ghcr.io/${{ github.repository }}:${{ github.ref_name }}"] \
+            --parameters commands=["sudo docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}", \
+                                  "sudo docker stop backend-lxd || true", \
+                                  "sudo docker run -d --name backend-lxd --restart=always -p 8080:8080 ghcr.io/${{ github.repository }}:${{ github.ref_name }}"] \
             --comment "Deploying tagged release ${GITHUB_REF_NAME} to BackendLXD"
