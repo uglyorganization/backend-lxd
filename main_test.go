@@ -17,7 +17,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("it should return 404 for any other endpoint", func(t *testing.T) {
-		resp, err := http.Get("http://localhost:8080/v1/nonexistent")
+		resp, err := http.Get("http://localhost:8080/nonexistent")
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 	})
@@ -28,7 +28,7 @@ func TestMain(t *testing.T) {
 		assert.ErrorContains(t, err, "connection refused")
 	})
 
-	t.Run("it should return unauthorized when API-key not presentGET", func(t *testing.T) {
+	t.Run("it should return unauthorized when API-key not present", func(t *testing.T) {
 		client := http.DefaultClient
 		req, err := http.NewRequest("GET", "http://localhost:8080/v1/protected", nil)
 		assert.NoError(t, err)
@@ -36,7 +36,7 @@ func TestMain(t *testing.T) {
 			panic(err)
 		}
 
-		req.Header.Set("API-Key", "your-api-key")
+		req.Header.Set("Authorization", "Beaer valid-key")
 
 		resp, err := client.Do(req)
 		assert.NoError(t, err)

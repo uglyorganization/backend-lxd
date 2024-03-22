@@ -1,52 +1,50 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
+	"os"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	slogecho "github.com/samber/slog-echo"
 )
-
-// AuthMiddleware performs api token validation for requests
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		apiKey := c.GetHeader("API-Key")
-		// Check if API key is empty or invalid
-		if apiKey == "" || !isValidAPIKey(apiKey) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			c.Abort()
-			return
-		}
-		// Proceed with the request
-		c.Next()
-	}
-}
-
-func isValidAPIKey(apiKey string) bool {
-	// Logic to validate API key against stored keys
-	// You can implement this based on how you manage API keys
-	// For demonstration purposes, let's assume a hardcoded API key
-	return apiKey == "your-api-key"
-}
 
 func main() {
 	Start()
 }
 
-// Start with a /health
+// Start echo server
 func Start() {
-	r := gin.Default()
-	r.Use(gin.Recovery())
-
-	r.GET("/health", func(c *gin.Context) {})
-
-	v1 := r.Group("/v1")
-	v1.Use(AuthMiddleware())
-	{
-		v1.GET("/protected", func(c *gin.Context) {})
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger = logger.With("env", "dev")
+	config := slogecho.Config{
+		WithRequestID:    true,
+		DefaultLevel:     slog.LevelInfo,
+		ClientErrorLevel: slog.LevelWarn,
+		ServerErrorLevel: slog.LevelError,
 	}
 
-	err := r.Run(":8080")
-	if err != nil {
-		panic("Error occurred while running the server: " + err.Error())
-	}
+	e := echo.New()
+	e.Use(middleware.RequestID())
+	e.Use(middleware.Secure())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+	e.Use(slogecho.NewWithConfig(logger, config))
+	e.Use(middleware.Recover())
+
+	// Routes
+	e.GET("/health", func(c echo.Context) error {
+		return c.NoContent(http.StatusOK)
+	})
+
+	g := e.Group("/v1")
+	g.Use(middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
+		return key == "valid-key", nil
+	}))
+	g.GET("/protected", func(c echo.Context) error {
+		return c.NoContent(http.StatusOK)
+	})
+
+	// Start server
+	e.Logger.Fatal(e.Start(":8080"))
 }
